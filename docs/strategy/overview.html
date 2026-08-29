@@ -1,0 +1,683 @@
+<title>OneWay 戦略OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --paper:#F4F7F9; --sheet:#FFFFFF; --sheet-2:#FAFCFD;
+  --ink:#141A21; --ink-2:#485462; --ink-3:#7B8793;
+  --rule:#DBE2E8; --rule-2:#B2BEC9;
+  --blue:#1F5580; --blue-ink:#1F5580; --blue-soft:#E9F1F8;
+  --brass:#8F6A22; --brass-soft:#F6EFDF;
+  --red:#9B3A32; --red-soft:#F8EAE8;
+  --shadow:0 1px 2px rgba(20,26,33,.05),0 8px 24px -14px rgba(20,26,33,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E1318; --sheet:#161C23; --sheet-2:#1B222A;
+    --ink:#E7ECF1; --ink-2:#A6B1BC; --ink-3:#76828F;
+    --rule:#28323C; --rule-2:#3C4A57;
+    --blue:#82B6E2; --blue-ink:#82B6E2; --blue-soft:#15242F;
+    --brass:#D5AE68; --brass-soft:#2A2216;
+    --red:#E08880; --red-soft:#2C1B19;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E1318; --sheet:#161C23; --sheet-2:#1B222A;
+  --ink:#E7ECF1; --ink-2:#A6B1BC; --ink-3:#76828F;
+  --rule:#28323C; --rule-2:#3C4A57;
+  --blue:#82B6E2; --blue-ink:#82B6E2; --blue-soft:#15242F;
+  --brass:#D5AE68; --brass-soft:#2A2216;
+  --red:#E08880; --red-soft:#2C1B19;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -14px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:"Noto Sans JP",system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
+  font-size:15px; line-height:1.85; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px 96px}
+h1,h2,h3,h4{font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif;text-wrap:balance;margin:0}
+.mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+
+/* ── title block ── */
+.titleblock{background:var(--sheet);border-bottom:2px solid var(--ink);}
+.titleblock .inner{max-width:1080px;margin:0 auto;padding:34px 22px 0}
+.eyebrow{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--blue-ink);font-weight:500}
+.titleblock h1{font-size:clamp(28px,4.6vw,46px);line-height:1.25;font-weight:700;margin:12px 0 6px;letter-spacing:-.01em}
+.titleblock .sub{color:var(--ink-2);font-size:16px;max-width:62ch;margin:0 0 26px}
+.tb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));border-top:1px solid var(--rule-2);border-left:1px solid var(--rule-2)}
+.tb-cell{border-right:1px solid var(--rule-2);border-bottom:1px solid var(--rule-2);padding:9px 12px}
+.tb-cell dt{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);margin:0 0 2px}
+.tb-cell dd{margin:0;font-size:13.5px;font-weight:500;line-height:1.5}
+
+/* ── sheet nav ── */
+nav.index{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--rule);
+  backdrop-filter:saturate(1.4) blur(6px)}
+nav.index ol{max-width:1080px;margin:0 auto;padding:0 22px;list-style:none;display:flex;gap:0;
+  overflow-x:auto;scrollbar-width:thin}
+nav.index a{font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.05em;color:var(--ink-3);
+  text-decoration:none;padding:11px 13px;display:block;white-space:nowrap;border-bottom:2px solid transparent}
+nav.index a:hover{color:var(--blue-ink);border-bottom-color:var(--blue-ink)}
+nav.index a:focus-visible{outline:2px solid var(--blue-ink);outline-offset:-2px}
+
+/* ── sheets ── */
+section{margin-top:52px;scroll-margin-top:52px}
+.sheet-no{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--ink);padding-bottom:8px;margin-bottom:22px;flex-wrap:wrap}
+.sheet-no .n{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.16em;color:var(--ink-3);font-weight:500}
+.sheet-no h2{font-size:clamp(20px,2.6vw,26px);font-weight:700;letter-spacing:-.005em}
+.sheet-no .ref{margin-left:auto;font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--ink-3);letter-spacing:.04em}
+.lede{font-size:16px;color:var(--ink-2);max-width:66ch;margin:0 0 22px}
+.lede strong{color:var(--ink);font-weight:700}
+
+.card{background:var(--sheet);border:1px solid var(--rule);border-radius:3px;padding:20px 22px;box-shadow:var(--shadow)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+
+h3.mini{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3);font-weight:500;margin:0 0 10px}
+h4.sub{font-size:15px;font-weight:700;margin:0 0 8px}
+
+/* old vs new */
+.vs{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}
+.vs .col{border:1px solid var(--rule);border-radius:3px;padding:18px 20px;background:var(--sheet)}
+.vs .col.old{opacity:.86}
+.vs .col.new{border-color:var(--blue-ink);border-width:1.5px;background:var(--sheet)}
+.chain{list-style:none;padding:0;margin:12px 0 0;font-size:14.5px}
+.chain li{padding:5px 0 5px 0;position:relative}
+.chain li+li:before{content:"↓";display:block;color:var(--ink-3);font-size:12px;line-height:1;margin:2px 0 4px}
+.col.old .chain li{color:var(--ink-2);text-decoration:line-through;text-decoration-color:var(--rule-2)}
+.col.new .chain li{font-weight:500}
+.col.new .chain li .lab{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--blue-ink);margin-right:8px;letter-spacing:.06em}
+
+/* three stacks */
+.stacks{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.stack{border:1px solid var(--rule);border-radius:3px;background:var(--sheet);overflow:hidden}
+.stack>header{padding:12px 16px;border-bottom:1px solid var(--rule);background:var(--sheet-2)}
+.stack>header .k{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.14em;color:var(--blue-ink);font-weight:600}
+.stack>header .t{font-family:"Zen Kaku Gothic New",sans-serif;font-weight:700;font-size:15px;margin-top:2px}
+.stack ul{list-style:none;margin:0;padding:0}
+.stack li{padding:9px 16px;border-bottom:1px solid var(--rule);font-size:13.5px;display:flex;gap:10px;align-items:baseline}
+.stack li:last-child{border-bottom:0}
+.stack li code{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink-3);min-width:34px;letter-spacing:.03em}
+.stack li.dim{color:var(--ink-3)}
+.stack li.key{background:var(--blue-soft)}
+.stack li.key code{color:var(--blue-ink);font-weight:600}
+
+/* market band */
+.bands{display:grid;gap:8px;margin-top:4px}
+.band{border:1px solid var(--rule);border-left:4px solid var(--rule-2);border-radius:3px;padding:14px 18px;background:var(--sheet)}
+.band .hd{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.band .rng{font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:600}
+.band .who{font-size:13.5px;color:var(--ink-2)}
+.band.target{border-color:var(--blue-ink);border-left-width:4px;border-left-color:var(--blue-ink);background:var(--blue-soft)}
+.band.target .rng{color:var(--blue-ink)}
+.band.target .who{color:var(--ink)}
+.band p{margin:6px 0 0;font-size:13.5px;color:var(--ink-2)}
+.band.target p{color:var(--ink)}
+
+/* ladder */
+.ladder{border:1px solid var(--rule);border-radius:3px;overflow:hidden;background:var(--sheet)}
+.rung{display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--rule)}
+.rung:last-child{border-bottom:0}
+.rung .lv{font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:600;color:#fff;background:var(--ink-2);
+  width:26px;height:26px;display:grid;place-items:center;border-radius:2px}
+.rung.arr .lv{background:var(--blue-ink)}
+.rung .nm{font-weight:500;font-size:14.5px}
+.rung .nm small{display:block;color:var(--ink-3);font-size:12px;font-weight:400;line-height:1.5}
+.rung .pr{font-family:"JetBrains Mono",monospace;font-size:13.5px;font-weight:500;text-align:right;white-space:nowrap}
+.rung.arr{background:var(--blue-soft)}
+.rung.arr .pr{color:var(--blue-ink);font-weight:700}
+.rung .bar{grid-column:1/-1;height:3px;background:var(--rule);border-radius:2px;overflow:hidden}
+.rung .bar i{display:block;height:100%;background:var(--brass)}
+
+/* flywheel */
+.flow{border:1px solid var(--rule);border-radius:3px;background:var(--sheet);overflow:hidden}
+.flow .el{display:grid;grid-template-columns:52px 1fr;gap:0;border-bottom:1px solid var(--rule)}
+.flow .el:last-of-type{border-bottom:0}
+.flow .el .tag{font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:600;color:var(--blue-ink);
+  background:var(--sheet-2);display:grid;place-items:center;border-right:1px solid var(--rule)}
+.flow .el .bd{padding:12px 18px}
+.flow .el .bd .t{font-weight:700;font-size:14.5px;font-family:"Zen Kaku Gothic New",sans-serif}
+.flow .el .bd .t em{font-style:normal;color:var(--ink-3);font-weight:400;font-size:12.5px;margin-left:8px;font-family:"JetBrains Mono",monospace}
+.flow .el .bd .d{font-size:13.5px;color:var(--ink-2);margin-top:2px}
+.flow .loop{padding:10px 18px 10px 70px;background:var(--brass-soft);font-size:13px;color:var(--brass);font-weight:500}
+
+/* tables */
+.tw{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--sheet)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:560px}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--rule);vertical-align:top}
+thead th{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;background:var(--sheet-2);white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+tbody th{font-weight:500;white-space:nowrap}
+tr.total td,tr.total th{font-weight:700;background:var(--blue-soft);color:var(--ink)}
+
+/* rules list */
+.rules{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.rules li{display:grid;grid-template-columns:30px 1fr;gap:14px;align-items:start;
+  border:1px solid var(--rule);border-left:3px solid var(--red);border-radius:3px;padding:13px 16px;background:var(--sheet)}
+.rules li .n{font-family:"JetBrains Mono",monospace;font-size:15px;font-weight:700;color:var(--red);line-height:1.5}
+.rules li b{display:block;font-size:14.5px;font-family:"Zen Kaku Gothic New",sans-serif}
+.rules li span{font-size:13px;color:var(--ink-2);display:block;margin-top:1px}
+
+/* callout */
+.callout{border:1px solid var(--rule-2);border-left:3px solid var(--brass);background:var(--brass-soft);
+  border-radius:3px;padding:14px 18px;font-size:14.5px}
+.callout b{font-family:"Zen Kaku Gothic New",sans-serif}
+.callout.blue{border-left-color:var(--blue-ink);background:var(--blue-soft)}
+
+/* 90 days */
+.days{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.day{border:1px solid var(--rule);border-radius:3px;background:var(--sheet);padding:16px 18px}
+.day .m{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.14em;color:var(--blue-ink);font-weight:600;text-transform:uppercase}
+.day h4{font-size:15px;font-weight:700;margin:4px 0 8px}
+.day ul{margin:0;padding-left:17px;font-size:13.5px;color:var(--ink-2)}
+.day li{margin:3px 0}
+
+/* open items */
+.open{display:grid;gap:8px}
+.open .it{border:1px solid var(--rule);border-radius:3px;background:var(--sheet);padding:13px 16px;
+  display:grid;grid-template-columns:60px 1fr;gap:14px;align-items:baseline}
+.open .it .id{font-family:"JetBrains Mono",monospace;font-size:11.5px;font-weight:600;color:var(--red)}
+.open .it .bd b{font-size:14px;font-family:"Zen Kaku Gothic New",sans-serif;display:block}
+.open .it .bd span{font-size:13px;color:var(--ink-2)}
+
+footer{margin-top:56px;padding-top:18px;border-top:2px solid var(--ink);
+  display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;
+  font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink-3);letter-spacing:.04em}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="titleblock">
+  <div class="inner">
+    <div class="eyebrow">OneWay株式会社 ／ 事業戦略</div>
+    <h1>Enterprise AI Architecture Company</h1>
+    <p class="sub">開発しない。設計し、標準を定め、エコシステムを保有する。<br>企業のAI活用における「設計事務所」になるための戦略OS。</p>
+    <dl class="tb-grid">
+      <div class="tb-cell"><dt>事業</dt><dd>OneWay Enterprise AI Platform</dd></div>
+      <div class="tb-cell"><dt>版</dt><dd class="mono">v1.0 — 初版</dd></div>
+      <div class="tb-cell"><dt>作成日</dt><dd class="mono">2026-08-29</dd></div>
+      <div class="tb-cell"><dt>管理者</dt><dd>高橋 宏明</dd></div>
+      <div class="tb-cell"><dt>現在地</dt><dd>Phase 0（型づくり）</dd></div>
+      <div class="tb-cell"><dt>状態</dt><dd>ドラフト／要決定 5件</dd></div>
+    </dl>
+  </div>
+</div>
+
+<nav class="index" aria-label="セクション">
+  <ol>
+    <li><a href="#s01">01 名乗り</a></li>
+    <li><a href="#s02">02 3つの階層</a></li>
+    <li><a href="#s03">03 ターゲット</a></li>
+    <li><a href="#s04">04 商品ラダー</a></li>
+    <li><a href="#s05">05 エコシステム</a></li>
+    <li><a href="#s06">06 技術構成</a></li>
+    <li><a href="#s07">07 収益モデル</a></li>
+    <li><a href="#s08">08 5年計画</a></li>
+    <li><a href="#s09">09 最初の90日</a></li>
+    <li><a href="#s10">10 鉄則</a></li>
+    <li><a href="#s11">11 要決定</a></li>
+  </ol>
+</nav>
+
+<div class="wrap">
+
+<section id="s01">
+  <div class="sheet-no"><span class="n">SHEET 01</span><h2>名乗りを変える</h2><span class="ref">docs/strategy/01-positioning.md</span></div>
+  <p class="lede">サービスを積み上げる会社は、売上が人数で決まります。<strong>レイヤーを保有する会社は、人数と無関係に成長します。</strong></p>
+  <div class="vs">
+    <div class="col old">
+      <h3 class="mini">旧 ／ サービス積み上げ型</h3>
+      <ul class="chain">
+        <li>AIコンサル</li>
+        <li>AI導入支援</li>
+        <li>業務自動化</li>
+      </ul>
+      <p style="font-size:13.5px;color:var(--ink-2);margin:14px 0 0;border-top:1px solid var(--rule);padding-top:12px">3つとも人が動いた分だけ売れます。資産が残らず、差別化できず、企業価値は売上×0.5〜1倍に留まります。</p>
+    </div>
+    <div class="col new">
+      <h3 class="mini" style="color:var(--blue-ink)">新 ／ レイヤー保有型</h3>
+      <ul class="chain">
+        <li><span class="lab">EL1</span>AI Strategy</li>
+        <li><span class="lab">EL2</span>AI Platform</li>
+        <li><span class="lab">EL3</span>AI Agent Library</li>
+        <li><span class="lab">EL4</span>Implementation Partners</li>
+        <li><span class="lab">EL5</span>Certification</li>
+        <li><span class="lab">EL6</span>Marketplace</li>
+      </ul>
+      <p style="font-size:13.5px;color:var(--ink-2);margin:14px 0 0;border-top:1px solid var(--rule);padding-top:12px">下のレイヤーが上のレイヤーの参入障壁になる、一本の構造物です。企業価値はARR×5〜8倍。</p>
+    </div>
+  </div>
+  <div style="margin-top:16px" class="card">
+    <h3 class="mini">中核アナロジー ／ OneWayは「設計事務所」である</h3>
+    <div class="tw" style="border:0;box-shadow:none">
+      <table style="min-width:480px">
+        <thead><tr><th>建築業界</th><th>OneWay</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td>建築設計事務所</td><td><b>OneWay</b></td><td>建てない。設計する。基準を決める</td></tr>
+          <tr><td>設計図・仕様書</td><td>AI Strategy</td><td>ここを握る者が全工程を規定する</td></tr>
+          <tr><td>建材・部材カタログ</td><td>AI Agent Library</td><td>標準化された部品を組み合わせて建てる</td></tr>
+          <tr><td>施工会社・工務店</td><td>Implementation Partners</td><td>設計事務所は施工会社を雇わない</td></tr>
+          <tr><td>建築士の資格制度</td><td>Certification</td><td>資格がなければ、その設計は施工できない</td></tr>
+          <tr><td>建材市場・流通</td><td>Marketplace</td><td>部材が売買される場。胴元が手数料を取る</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin:14px 0 0;font-size:14px"><b>「従業員を大量に抱えず、高単価Enterprise案件を扱う」は精神論ではありません。</b>この構造から自動的に導かれます。</p>
+  </div>
+</section>
+
+<section id="s02">
+  <div class="sheet-no"><span class="n">SHEET 02</span><h2>3つの階層を混同しない</h2><span class="ref">docs/strategy/README.md</span></div>
+  <p class="lede">性質の異なる3つの階層構造が、同時に走ります。<strong>取り違えると議論が噛み合わなくなります。</strong></p>
+  <div class="stacks">
+    <div class="stack">
+      <header><div class="k">EL1 – EL6</div><div class="t">事業エコシステム</div></header>
+      <ul>
+        <li><code>EL1</code>AI Strategy</li>
+        <li class="key"><code>EL2</code>AI Platform</li>
+        <li><code>EL3</code>AI Agent Library</li>
+        <li><code>EL4</code>Implementation Partners</li>
+        <li><code>EL5</code>Certification</li>
+        <li><code>EL6</code>Marketplace</li>
+      </ul>
+    </div>
+    <div class="stack">
+      <header><div class="k">LEVEL 0 – 5</div><div class="t">商品ラダー</div></header>
+      <ul>
+        <li><code>L0</code>Executive AI Briefing</li>
+        <li><code>L1</code>Enterprise AI Assessment</li>
+        <li><code>L2</code>AI Proof of Value</li>
+        <li class="key"><code>L3</code>Department AI Platform</li>
+        <li class="key"><code>L4</code>Enterprise AI Platform</li>
+        <li class="key"><code>L5</code>Enterprise Agreement</li>
+      </ul>
+    </div>
+    <div class="stack">
+      <header><div class="k">T1 – T7</div><div class="t">技術アーキテクチャ</div></header>
+      <ul>
+        <li class="key"><code>T1</code>Control Center</li>
+        <li class="key"><code>T2</code>AI Agent Layer</li>
+        <li><code>T3</code>Workflow Layer</li>
+        <li class="key"><code>T4</code>Knowledge Layer</li>
+        <li class="key"><code>T5</code>Gateway / Governance</li>
+        <li class="dim"><code>T6</code>Enterprise Systems（接続のみ）</li>
+        <li class="dim"><code>T7</code>AI / Cloud（作らない）</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout blue" style="margin-top:14px">
+    <b>対応関係：</b>事業レイヤー <span class="mono">EL2</span> を、商品ラダー <span class="mono">Level 3〜5</span> として売り、技術 <span class="mono">T1〜T5</span> で実装する。
+  </div>
+</section>
+
+<section id="s03">
+  <div class="sheet-no"><span class="n">SHEET 03</span><h2>ターゲットは市場の空白地帯</h2><span class="ref">docs/strategy/02-icp-target.md</span></div>
+  <p class="lede">大手コンサルには相手にされず、AIベンダーには経営課題を理解されない。<strong>その不満を抱えた帯を狙います。</strong></p>
+  <div class="bands">
+    <div class="band">
+      <div class="hd"><span class="rng">売上 1,000億円〜</span><span class="who">大手コンサル・大手SIerの陣地</span></div>
+      <p>提案1本で数千万〜数億円。設立年数と体制で戦えません。Y4以降に再検討します。</p>
+    </div>
+    <div class="band target">
+      <div class="hd"><span class="rng">売上 30〜500億円 ／ 従業員 100〜2,000名</span><span class="who">★ OneWayの主戦場 ★</span></div>
+      <p>大手コンサルは採算が合わず本気で来ない。零細AIベンダーは経営レベルで話せない。社内にAI専門部署がなく内製できない。<b>しかし年間3,000万〜1億円のIT投資はできます。</b></p>
+    </div>
+    <div class="band">
+      <div class="hd"><span class="rng">売上 30億円未満</span><span class="who">零細AIベンダー・ツール販売の陣地</span></div>
+      <p>予算が3桁万円。エンタープライズ商材が入りません。</p>
+    </div>
+  </div>
+  <div class="grid2" style="margin-top:16px">
+    <div class="card">
+      <h3 class="mini">重点8業種</h3>
+      <p style="margin:0 0 10px;font-size:13.5px;color:var(--ink-2)">ホワイトカラー業務が大量にあり、AI専門部署が弱い業種。</p>
+      <div class="tw" style="border:0;box-shadow:none">
+        <table style="min-width:420px">
+          <thead><tr><th>業種</th><th>最初に刺さる業務</th></tr></thead>
+          <tbody>
+            <tr><td>不動産</td><td>問い合わせ／契約書チェック／物件資料</td></tr>
+            <tr><td>小売・多店舗</td><td>店舗日報の集計／本部報告</td></tr>
+            <tr><td>医療周辺</td><td>各種書類作成／問い合わせ</td></tr>
+            <tr><td>介護</td><td>介護記録／ケアプラン／請求事務</td></tr>
+            <tr><td>物流</td><td>荷主対応／請求照会／安全書類</td></tr>
+            <tr><td>建設</td><td>見積作成／施工計画／安全書類</td></tr>
+            <tr><td>人材</td><td>求人票／スカウト文／面談記録</td></tr>
+            <tr><td>多店舗サービス</td><td>店舗報告／マニュアル／SV業務</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <h3 class="mini">接触する相手</h3>
+      <p style="margin:0 0 12px;font-size:14.5px"><b>社長・取締役・経営企画・DX責任者に限定します。</b></p>
+      <p style="margin:0 0 14px;font-size:13.5px;color:var(--ink-2)">現場担当が窓口の案件は、必ず「ツール比較」に落ちて価格競争になります。経営層への説明機会をいただけない案件からは降ります。</p>
+      <h3 class="mini" style="margin-top:18px">禁句</h3>
+      <div style="border:1px solid var(--rule);border-left:3px solid var(--red);background:var(--red-soft);border-radius:3px;padding:12px 14px;font-size:14px">
+        「生成AIについて、何かお困りごとはありますか？」<br>
+        <span style="font-size:12.5px;color:var(--ink-2)">— ツールベンダーの質問。経営者は「特にない」で終わらせます。</span>
+      </div>
+      <div style="border:1px solid var(--rule);border-left:3px solid var(--blue-ink);background:var(--blue-soft);border-radius:3px;padding:12px 14px;font-size:14px;margin-top:8px">
+        「その目標を達成するために、あと何人採用が必要ですか。<br>その採用は、実際にできそうですか。」<br>
+        <span style="font-size:12.5px;color:var(--ink-2)">— 「採用できない」と答えた瞬間、AIは成長制約の解決の話になります。</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="s04">
+  <div class="sheet-no"><span class="n">SHEET 04</span><h2>6階建て商品ラダー</h2><span class="ref">docs/strategy/03-product-ladder.md</span></div>
+  <p class="lede">新規顧客を追い続ける会社は、永遠に営業し続けます。<strong>既存顧客の単価を上げる会社は、営業しなくても成長します。</strong></p>
+  <div class="ladder">
+    <div class="rung"><span class="lv">0</span><span class="nm">Executive AI Briefing<small>半日〜1日 ／ 社長＋役員3〜8名</small></span><span class="pr">50〜100万円</span></div>
+    <div class="rung arr"><span class="lv">1</span><span class="nm">Enterprise AI Assessment<small>4〜6週間 ／ 最終報告は経営会議で実施　★営業商品★</small></span><span class="pr">300万円</span></div>
+    <div class="rung"><span class="lv">2</span><span class="nm">AI Proof of Value<small>8〜12週間 ／ PoCではなく「価値の証明」</small></span><span class="pr">500〜800万円</span></div>
+    <div class="rung"><span class="lv">3</span><span class="nm">Department AI Platform<small>年間契約 ／ 1〜3部門・100〜300ユーザー　★ARR開始★</small></span><span class="pr">1,000〜2,000万円</span></div>
+    <div class="rung"><span class="lv">4</span><span class="nm">Enterprise AI Platform<small>年間契約 ／ 全社・500〜2,000ユーザー</small></span><span class="pr">3,000〜8,000万円</span></div>
+    <div class="rung"><span class="lv">5</span><span class="nm">Enterprise Agreement<small>3年包括 ／ グループ展開権・Marketplace枠を包含</small></span><span class="pr">年3,000〜8,000万円 ×3年</span></div>
+  </div>
+  <div class="grid2" style="margin-top:16px">
+    <div class="card">
+      <h3 class="mini">Land &amp; Expand ／ 1社あたり累積</h3>
+      <div class="tw" style="border:0;box-shadow:none">
+        <table style="min-width:340px">
+          <thead><tr><th>年</th><th>Level</th><th class="num">金額</th><th class="num">累積</th></tr></thead>
+          <tbody>
+            <tr><td>Y1上</td><td>0</td><td class="num">75万</td><td class="num">75万</td></tr>
+            <tr><td>Y1下</td><td>1</td><td class="num">300万</td><td class="num">375万</td></tr>
+            <tr><td>Y2上</td><td>2</td><td class="num">650万</td><td class="num">1,025万</td></tr>
+            <tr><td>Y2下–Y3</td><td>3</td><td class="num">1,500万×2</td><td class="num">4,025万</td></tr>
+            <tr><td>Y4</td><td>4</td><td class="num">5,000万</td><td class="num">9,025万</td></tr>
+            <tr class="total"><td>Y5</td><td>5</td><td class="num">4,000万</td><td class="num">1.3億円</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin:12px 0 0;font-size:13.5px;color:var(--ink-2)">10社育てれば、それだけで累積13億円。<b style="color:var(--ink)">追うべきは「今年何社取ったか」ではなく「既存◯社を次のLevelに上げられたか」です。</b></p>
+    </div>
+    <div class="card">
+      <h3 class="mini">300万円の Assessment が作る意思決定の転換</h3>
+      <div style="border:1px solid var(--rule);border-radius:3px;padding:14px 16px;background:var(--sheet-2);font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:2">
+        AI適用候補業務　　　　<b>87業務</b><br>
+        年間削減可能時間　　<b>24,000時間</b><br>
+        推定経済効果（理論値）<b>年1.4億円</b><br>
+        <span style="color:var(--ink-3)">─────────────────</span><br>
+        <span style="color:var(--brass)">初年度実現率　　　　　<b>30%</b></span><br>
+        <span style="color:var(--brass)">初年度実現効果　　<b>年4,300万円</b></span><br>
+        初年度AI投資　　　　<b>3,000万円</b><br>
+        <b style="color:var(--blue-ink)">投資回収期間　　　　　8.3か月</b>
+      </div>
+      <p style="margin:12px 0 0;font-size:13.5px"><b>実現率を必ず明示します。</b>理論値だけだと回収2.6ヶ月になり、CFOに信用されません。<span style="color:var(--ink-2)">自社の数字を自ら割り引いて見せることが、300万円の報告書に信頼性を与えます。</span></p>
+      <div class="callout" style="margin-top:12px;font-size:13.5px">
+        <b>「システムに3,000万円払うか？」ではなく<br>「1.4億円の経済効果を取りにいくか？」</b><br>
+        <span style="color:var(--ink-2)">コストの意思決定から、投資の意思決定へ。購買部門の管轄から、経営会議の管轄へ。</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="s05">
+  <div class="sheet-no"><span class="n">SHEET 05</span><h2>エコシステムのフライホイール</h2><span class="ref">docs/strategy/05-ecosystem-model.md</span></div>
+  <p class="lede">積み上げではなく循環です。<strong>各レイヤーが次のレイヤーを起動し、最後に案件が入口へ還流します。</strong></p>
+  <div class="flow">
+    <div class="el"><div class="tag">EL1</div><div class="bd"><div class="t">AI Strategy<em>設計を握る</em></div><div class="d">設計を握ると、実装する基盤は必然的にOneWay製になります</div></div></div>
+    <div class="el"><div class="tag">EL2</div><div class="bd"><div class="t">AI Platform<em>収益の背骨</em></div><div class="d">プラットフォームが「エージェントの置き場所」になります</div></div></div>
+    <div class="el"><div class="tag">EL3</div><div class="bd"><div class="t">AI Agent Library<em>標準の実体</em></div><div class="d">パートナーが売れる商材ができて初めて、パートナーが集まります</div></div></div>
+    <div class="el"><div class="tag">EL4</div><div class="bd"><div class="t">Implementation Partners<em>他社の人員</em></div><div class="d">パートナーが増えると品質のばらつきが問題になり、認定に需要が生まれます</div></div></div>
+    <div class="el"><div class="tag">EL5</div><div class="bd"><div class="t">Certification<em>供給側のロック</em></div><div class="d">品質保証があるから、第三者の資産を安心して売買できます</div></div></div>
+    <div class="el"><div class="tag">EL6</div><div class="bd"><div class="t">Marketplace<em>市場の保有</em></div><div class="d">市場に集まった企業が「うちも」と言い出します。その入口は必ず設計です</div></div></div>
+    <div class="loop">↺ 案件が EL1 へ還流する — 円環が一周した瞬間、営業しなくても案件が来る会社になります</div>
+  </div>
+  <div class="grid2" style="margin-top:16px">
+    <div class="card">
+      <h3 class="mini">レバレッジの階段</h3>
+      <div class="tw" style="border:0;box-shadow:none">
+        <table style="min-width:400px">
+          <thead><tr><th>レイヤー</th><th>人的依存</th><th>スケール手段</th><th class="num">粗利</th></tr></thead>
+          <tbody>
+            <tr><td>EL1 Strategy</td><td>最高</td><td>フレームワーク化</td><td class="num">70%</td></tr>
+            <tr><td>EL2 Platform</td><td>中</td><td>ソフトウェア</td><td class="num">65–75%</td></tr>
+            <tr><td>EL3 Library</td><td>低</td><td>資産の複製</td><td class="num">85%</td></tr>
+            <tr><td>EL4 Partners</td><td>低</td><td><b>他社の人員</b></td><td class="num">90%</td></tr>
+            <tr><td>EL5 Certification</td><td>極低</td><td>制度</td><td class="num">85%</td></tr>
+            <tr><td>EL6 Marketplace</td><td>極低</td><td>ネットワーク効果</td><td class="num">95%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <h3 class="mini">失敗パターン ／ 順序を間違えると全部壊れる</h3>
+      <ul style="margin:0;padding-left:18px;font-size:13.5px;color:var(--ink-2)">
+        <li style="margin:7px 0"><b style="color:var(--ink)">EL1を手放す</b> — 設計を他社に任せると、ただの基盤ベンダーに転落します</li>
+        <li style="margin:7px 0"><b style="color:var(--ink)">仕様を決めずに本数を増やす</b> — 形式がバラバラで資産になりません</li>
+        <li style="margin:7px 0"><b style="color:var(--ink)">売るものがない状態でパートナー募集</b> — 募集した事実だけが残り信用を失います</li>
+        <li style="margin:7px 0"><b style="color:var(--ink)">需要がない状態で認定制度</b> — 受験者ゼロの資格は笑われます</li>
+        <li style="margin:7px 0"><b style="color:var(--ink)">供給も需要も足りない状態で市場を開く</b> — 過疎化が全体の信用を毀損します</li>
+        <li style="margin:7px 0"><b style="color:var(--red)">全レイヤーを同時に立ち上げる</b> — 最も起きやすい失敗。<b style="color:var(--ink)">1期に着手するのは1レイヤーまで</b></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="s06">
+  <div class="sheet-no"><span class="n">SHEET 06</span><h2>技術構成と、最初に作る4つ</h2><span class="ref">docs/strategy/04-architecture.md</span></div>
+  <p class="lede">作らないものを明確にすることが、<strong>少人数で高単価を扱うための条件です。</strong></p>
+  <div class="grid2">
+    <div class="card">
+      <h3 class="mini">7層アーキテクチャ ／ 作る・作らない</h3>
+      <div class="tw" style="border:0;box-shadow:none">
+        <table style="min-width:420px">
+          <thead><tr><th></th><th>層</th><th>差別化</th><th>方針</th></tr></thead>
+          <tbody>
+            <tr><th class="mono">T1</th><td>Control Center</td><td><b style="color:var(--blue-ink)">極高</b></td><td><b>独自開発（最優先）</b></td></tr>
+            <tr><th class="mono">T2</th><td>AI Agent Layer</td><td>高</td><td>独自開発（資産化）</td></tr>
+            <tr><th class="mono">T3</th><td>Workflow Layer</td><td>中</td><td>薄く自作＋既存連携</td></tr>
+            <tr><th class="mono">T4</th><td>Knowledge Layer</td><td>高</td><td>独自開発</td></tr>
+            <tr><th class="mono">T5</th><td>Gateway / Governance</td><td><b style="color:var(--blue-ink)">極高</b></td><td><b>独自開発（最優先）</b></td></tr>
+            <tr><th class="mono">T6</th><td>Enterprise Systems</td><td>低</td><td style="color:var(--ink-3)">接続のみ。作らない</td></tr>
+            <tr><th class="mono">T7</th><td>AI / Cloud</td><td>ゼロ</td><td style="color:var(--red)"><b>絶対に作らない</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin:12px 0 0;font-size:13.5px;color:var(--ink-2)"><b style="color:var(--ink)">独自モデルは作りません。</b>モデルは3年で陳腐化しますが、企業の業務知識とガバナンス設計は陳腐化しません。</p>
+    </div>
+    <div class="card">
+      <h3 class="mini">最初に開発する4プロダクト</h3>
+      <div style="display:grid;gap:9px;margin-top:2px">
+        <div style="border:1px solid var(--rule);border-radius:3px;padding:11px 14px">
+          <b style="font-family:'Zen Kaku Gothic New',sans-serif;font-size:14px">③ OneWay Governance</b>
+          <div style="font-size:13px;color:var(--ink-2)">誰が・何のAIで・何のデータを・何に使ったか。<b style="color:var(--ink)">エンタープライズで価格を上げる最大の要素。</b></div>
+        </div>
+        <div style="border:1px solid var(--rule);border-radius:3px;padding:11px 14px">
+          <b style="font-family:'Zen Kaku Gothic New',sans-serif;font-size:14px">② OneWay Knowledge Hub</b>
+          <div style="font-size:13px;color:var(--ink-2)">社内規程・マニュアル・FAQ・契約書の共通知識層。差別化は技術ではなく<b style="color:var(--ink)">鮮度管理・権限連動・出典明示</b>の運用設計。</div>
+        </div>
+        <div style="border:1px solid var(--rule);border-radius:3px;padding:11px 14px">
+          <b style="font-family:'Zen Kaku Gothic New',sans-serif;font-size:14px">① OneWay AI Catalog</b>
+          <div style="font-size:13px;color:var(--ink-2)">顧客が最初に価値を感じる場所。<b style="color:var(--ink)">本数より、エージェント記述仕様を先に決めます。</b></div>
+        </div>
+        <div style="border:1.5px solid var(--blue-ink);background:var(--blue-soft);border-radius:3px;padding:11px 14px">
+          <b style="font-family:'Zen Kaku Gothic New',sans-serif;font-size:14px">④ OneWay AI Control Center</b>
+          <div style="font-size:13px">利用量／削減時間／AIコスト／自動処理件数／推定ROI。<b>機能は地味ですが、4つの中で最も事業インパクトが大きい。</b></div>
+        </div>
+      </div>
+      <p style="margin:12px 0 0;font-size:13px;color:var(--ink-2)"><b style="color:var(--ink)">Control Center の3つの機能：</b>①更新率を守る装置 ②他部門への横展開を社長に言わせる装置 ③新規商談で見せる装置。</p>
+    </div>
+  </div>
+  <div class="callout blue" style="margin-top:14px"><b>90日MVPの唯一の合格基準：</b>90日目に「経営会議で成果を報告できる」こと。</div>
+</section>
+
+<section id="s07">
+  <div class="sheet-no"><span class="n">SHEET 07</span><h2>収益モデル</h2><span class="ref">docs/strategy/06-revenue-model.md</span></div>
+  <p class="lede">固定年間契約 ＋ 従量課金 ＋ オプション。<strong>顧客のAI利用が増えるほど、OneWayの売上も増える構造にします。</strong></p>
+  <div class="grid2">
+    <div class="card">
+      <h3 class="mini">4要素の複合課金</h3>
+      <div class="tw" style="border:0;box-shadow:none">
+        <table style="min-width:400px">
+          <thead><tr><th>要素</th><th class="num">価格</th><th>役割</th></tr></thead>
+          <tbody>
+            <tr><th>① 基本料金</th><td class="num">年1,000〜8,000万円</td><td>ARRの土台</td></tr>
+            <tr><th>② AI Capacity</th><td class="num">クレジット従量</td><td>原価を守る</td></tr>
+            <tr><th>③ 追加Agent</th><td class="num">月5〜20万／Agent</td><td><b>NRRの主エンジン</b></td></tr>
+            <tr><th>④ Support</th><td class="num">年200〜800万円</td><td>高粗利（85%＋）</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 class="mini" style="margin-top:18px">従量課金の設計原則</h3>
+      <p style="margin:0;font-size:13.5px"><b>まず「原価を守る仕組み」。次に「利用拡大を売上に変える仕組み」。</b><br><span style="color:var(--ink-2)">クレジットが尽きて業務が止まる体験は、解約に直結します。<b style="color:var(--ink)">止まらないことを第一要件にします。</b>同梱クレジットの原価は基本料金の15%以内。</span></p>
+    </div>
+    <div class="card">
+      <h3 class="mini">追加Agentの経済性 ／ 数字の現実化</h3>
+      <div class="tw" style="border:0;box-shadow:none">
+        <table style="min-width:400px">
+          <thead><tr><th>見立て</th><th>同時稼働</th><th class="num">年間追加収益</th></tr></thead>
+          <tbody>
+            <tr><td style="color:var(--ink-3)">誤った期待</td><td style="color:var(--ink-3)">50種すべて</td><td class="num" style="color:var(--ink-3)">6,000万円</td></tr>
+            <tr class="total"><td>現実的な見立て</td><td>5〜10種</td><td class="num">600〜1,200万円</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin:12px 0 0;font-size:13.5px;color:var(--ink-2)">カタログ50種は「1社が全部買う」ためではなく、<b style="color:var(--ink)">どの業種のどの部門にも必ず刺さるものがあるための品揃え</b>です。</p>
+      <div class="callout" style="margin-top:12px;font-size:13.5px"><b>それでも強力です。</b>基本料金1,500万円に対して＋40〜80%。<b>追加Agentだけで NRR 140〜180%</b>が実現します。新規ゼロでも年40%成長する構造です。</div>
+    </div>
+  </div>
+</section>
+
+<section id="s08">
+  <div class="sheet-no"><span class="n">SHEET 08</span><h2>5年計画</h2><span class="ref">docs/strategy/08-execution-plan.md</span></div>
+  <p class="lede">1期に着手する事業レイヤーは1つまで。<strong>デリバリーの55%をパートナーが担うことで、従業員25名でARR 8億円が成立します。</strong></p>
+  <div class="tw">
+    <table style="min-width:760px">
+      <thead>
+        <tr><th></th><th>Y1 26/9–27/8</th><th>Y2 27/9–28/8</th><th>Y3 28/9–29/8</th><th>Y4 29/9–30/8</th><th>Y5 30/9–31/8</th></tr>
+      </thead>
+      <tbody>
+        <tr><th>主レイヤー</th><td>EL1 + EL2</td><td>+ <b>EL3</b></td><td>+ <b>EL4</b></td><td>+ <b>EL5</b></td><td>+ <b>EL6</b></td></tr>
+        <tr><th>Platform 顧客数</th><td class="num">2社</td><td class="num">8社</td><td class="num">19社</td><td class="num">30社</td><td class="num">42社</td></tr>
+        <tr><th>総売上</th><td class="num">1.02億円</td><td class="num">2.55億円</td><td class="num">5.48億円</td><td class="num">7.95億円</td><td class="num">10.5億円</td></tr>
+        <tr class="total"><th>期末ARR</th><td class="num">3,000万円</td><td class="num">1.45億円</td><td class="num">3.6億円</td><td class="num">5.8億円</td><td class="num">8.0億円</td></tr>
+        <tr><th>粗利率</th><td class="num">45%</td><td class="num">55%</td><td class="num">65%</td><td class="num">70%</td><td class="num">73%</td></tr>
+        <tr><th>従業員</th><td class="num">3名</td><td class="num">7名</td><td class="num">14名</td><td class="num">20名</td><td class="num">25名</td></tr>
+        <tr><th>1人あたり売上</th><td class="num">3,400万</td><td class="num">3,640万</td><td class="num">3,910万</td><td class="num">3,980万</td><td class="num">4,200万</td></tr>
+        <tr><th>パートナー経由</th><td class="num">0%</td><td class="num">10%</td><td class="num">30%</td><td class="num">45%</td><td class="num">55%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="grid2" style="margin-top:16px">
+    <div class="card">
+      <h3 class="mini">企業価値への影響</h3>
+      <div class="tw" style="border:0;box-shadow:none">
+        <table style="min-width:340px">
+          <thead><tr><th></th><th class="num">受託のまま</th><th class="num">本プラン（Y5）</th></tr></thead>
+          <tbody>
+            <tr><th>売上</th><td class="num">10.5億円</td><td class="num">10.5億円</td></tr>
+            <tr><th>うちARR</th><td class="num">0</td><td class="num">8.0億円</td></tr>
+            <tr><th>評価倍率</th><td class="num">売上×0.5–1</td><td class="num">ARR×5–8</td></tr>
+            <tr class="total"><th>推定企業価値</th><td class="num">5–10億円</td><td class="num">40–64億円</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin:12px 0 0;font-size:13.5px;color:var(--ink-2)">同じ売上でも、<b style="color:var(--ink)">契約形態の違いだけで企業価値は5〜6倍変わります。</b></p>
+    </div>
+    <div class="card">
+      <h3 class="mini">毎月見る数字は3つだけ</h3>
+      <div style="display:grid;gap:10px;margin-top:4px">
+        <div style="border-left:3px solid var(--blue-ink);padding-left:12px"><b style="font-size:14.5px;font-family:'Zen Kaku Gothic New',sans-serif">ARR</b><div style="font-size:13px;color:var(--ink-2)">結果を示す数字</div></div>
+        <div style="border-left:3px solid var(--brass);padding-left:12px"><b style="font-size:14.5px;font-family:'Zen Kaku Gothic New',sans-serif">週次アクティブ利用率</b><div style="font-size:13px;color:var(--ink-2)">更新の原因。<b style="color:var(--ink)">40%を切ったら即介入</b></div></div>
+        <div style="border-left:3px solid var(--red);padding-left:12px"><b style="font-size:14.5px;font-family:'Zen Kaku Gothic New',sans-serif">初回面談の経営層比率</b><div style="font-size:13px;color:var(--ink-2)">受注の原因。<b style="color:var(--ink)">70%を下回ったらターゲティングが崩れています</b></div></div>
+      </div>
+      <p style="margin:14px 0 0;font-size:13px;color:var(--ink-2)">「使われていない」は必ず解約の9ヶ月前に検知できます。<b style="color:var(--ink)">検知して動かないことだけが失敗です。</b></p>
+    </div>
+  </div>
+</section>
+
+<section id="s09">
+  <div class="sheet-no"><span class="n">SHEET 09</span><h2>最初の90日</h2><span class="ref">docs/strategy/08-execution-plan.md §7</span></div>
+  <p class="lede">この3ヶ月で「売れる状態」を作ります。<strong>売り始めるのは11月です。</strong></p>
+  <div class="days">
+    <div class="day">
+      <div class="m">Month 1 ／ 2026年9月</div>
+      <h4>商品と仕様を確定する</h4>
+      <ul>
+        <li>Level 0〜5 の商品定義・価格を確定（<b>Level 4/5 論点の決着</b>）</li>
+        <li>ソリューションアーキテクト（業務委託）の募集開始</li>
+        <li><b>エージェント記述仕様 v1 を確定</b></li>
+        <li>Assessment 9工程の手順書化＋報告書テンプレート</li>
+        <li>契約書・利用規約・SLA・DPA の法務レビュー</li>
+      </ul>
+    </div>
+    <div class="day">
+      <div class="m">Month 2 ／ 2026年10月</div>
+      <h4>売る準備と最小開発</h4>
+      <ul>
+        <li>Governance 最小版（認証・権限・ログ）の開発着手</li>
+        <li>Knowledge Hub 最小版（文書500件で動作）</li>
+        <li>セキュリティホワイトペーパー＋チェックシート回答集</li>
+        <li>Executive AI Briefing 資料／業種別マップ8種</li>
+        <li><b>ICPリスト200社を作成・スコアリング</b></li>
+      </ul>
+    </div>
+    <div class="day">
+      <div class="m">Month 3 ／ 2026年11月</div>
+      <h4>売り始める</h4>
+      <ul>
+        <li>ICP上位30社へ接触開始（紹介ルート優先）</li>
+        <li>Executive AI Briefing 初回実施</li>
+        <li><b>Assessment を3件受注（900万円）</b></li>
+        <li>AI Catalog v1（エージェント10種）</li>
+        <li><b>受託単発契約の新規受付を正式停止</b></li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:14px"><b>90日後の判定：</b>Assessment 3件以上／商品定義・価格・契約書・記述仕様の確定／Governance＋Knowledge Hub 稼働／ICP 70点以上100社／SA確保。<b>3つ以上未達なら、価格ではなくターゲット定義とチャネルを疑ってください。</b></div>
+</section>
+
+<section id="s10">
+  <div class="sheet-no"><span class="n">SHEET 10</span><h2>絶対に守る5つの鉄則</h2><span class="ref">docs/strategy/README.md §5</span></div>
+  <p class="lede">これだけは、どの文書よりも優先します。</p>
+  <ul class="rules">
+    <li><span class="n">1</span><div><b>顧客ごとにコードを書かない</b><span>顧客別要件は設定・テンプレートで吸収する。破った瞬間、契約書に何と書いてあろうと受託会社に戻り、EL3以降が永久に始まりません。</span></div></li>
+    <li><span class="n">2</span><div><b>現場担当を窓口にしない。経営層に限定する</b><span>現場から入った案件は、必ずツール比較と価格競争に落ちます。</span></div></li>
+    <li><span class="n">3</span><div><b>無料提案・無料PoCをしない</b><span>商品ラダー全体が崩壊し、投資意思のない客に工数を奪われます。</span></div></li>
+    <li><span class="n">4</span><div><b>1期に着手する事業レイヤーは1つまで</b><span>構想が壮大なほど「全部同時」の誘惑が強くなります。少人数では全部が中途半端になります。</span></div></li>
+    <li><span class="n">5</span><div><b>未確認の数字を対外資料に書かない</b><span>AWS Marketplaceの手数料・充当率、他社の価格、規格の要求事項。一度の誤りで、この価格帯の信頼は戻りません。</span></div></li>
+  </ul>
+</section>
+
+<section id="s11">
+  <div class="sheet-no"><span class="n">SHEET 11</span><h2>要決定・要確認</h2><span class="ref">docs/strategy/10, 11</span></div>
+  <p class="lede">決めていないことを「決めていない」と書いておくための欄です。<strong>推測で計画に織り込まないでください。</strong></p>
+  <h3 class="mini">未決事項 ／ Hiroの判断が必要</h3>
+  <div class="open">
+    <div class="it"><span class="id">U-001</span><div class="bd"><b>Level 4 と Level 5 の価格整合　【最優先・Phase 0 W1】</b><span>Level 4（3,000〜8,000万円）に対し Level 5（年1,000〜3,000万円）が安く、ラダーの原則と矛盾しています。<b>推奨は C：Level 5 を複数年包括契約とし、年額を Level 4 同等以上 × 3年コミットにする。</b></span></div></div>
+    <div class="it"><span class="id">U-002</span><div class="bd"><b>最初に密度を作る2業種の選定</b><span>重点8業種を同時に攻めると、業種別テンプレートの蓄積が薄まります。既存クライアントの業種分布と紹介ルートの強さで判断します。</span></div></div>
+    <div class="it"><span class="id">U-003</span><div class="bd"><b>デザインパートナー価格の割引幅</b><span>50% / 30% / 値引きなし。いずれの場合も、翌年以降の価格階段を契約書に明記することが条件です。</span></div></div>
+    <div class="it"><span class="id">U-004</span><div class="bd"><b>増資の要否と時期</b><span>資本金90万円は、この帯の企業の与信審査で不利に働く可能性があります。Assessment 5件実施後に判断します。</span></div></div>
+    <div class="it"><span class="id">U-005</span><div class="bd"><b>既存B2C事業（OWL / Executive AI Camp / Udemy）との関係整理</b><span>エンタープライズ顧客から見たとき、B2C教育事業の存在が信頼を上げるか下げるか。</span></div></div>
+  </div>
+  <h3 class="mini" style="margin-top:22px">一次情報の確認が必要 ／ 提案書に書く前に</h3>
+  <div class="tw">
+    <table style="min-width:560px">
+      <thead><tr><th>項目</th><th>なぜ危険か</th><th>期限</th></tr></thead>
+      <tbody>
+        <tr><td>AWS Marketplace の出品者登録要件・手数料率</td><td>粗利計算とPhase 3計画の前提</td><td class="mono">Y3前</td></tr>
+        <tr><td><b>顧客のクラウドコミット枠への充当率</b></td><td><b>「全額充当できます」と営業すると信頼を失います</b></td><td class="mono">案件ごと</td></tr>
+        <tr><td>Salesforce Agentforce の最新価格</td><td>比較資料に古い数値を載せると信頼を失います</td><td class="mono">提案書作成前</td></tr>
+        <tr><td>AI事業者ガイドライン／ISO 42001 の要求事項</td><td>対応表を誤ると法務審査で落ちます</td><td class="mono">Phase 0</td></tr>
+        <tr><td><b>1実行あたりのAI原価・月間実行回数</b></td><td><b>粗利率70%の維持可否が決まります</b></td><td class="mono">初号案件90日</td></tr>
+        <tr><td>既存受託収入の実額</td><td>財務モデルが仮置き（Y1 2,000万円）のままです</td><td class="mono">即時</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <span>ONEWAY 戦略OS ／ docs/strategy/ — 12文書</span>
+  <span>REV 1.0 ／ 2026-08-29 ／ Phase 0</span>
+</footer>
+
+</div>
