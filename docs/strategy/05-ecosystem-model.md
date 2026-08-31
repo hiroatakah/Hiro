@@ -47,7 +47,7 @@ OneWay の戦略には、性質の異なる3つの階層構造が同時に存在
    │                               │                               │
    │                               ▼                               │
    │  EL2 AI Platform               収益の背骨（ARR）                │
-   │      ・OneWay Enterprise AI Platform（年間利用権）              │
+   │      ・OneWay Enterprise AIOS（年間利用権）              │
    │      ・ガバナンス / ナレッジ基盤 / 監査                          │
    │                               │                               │
    │                               ▼                               │
@@ -163,7 +163,7 @@ OneWay の戦略には、性質の異なる3つの階層構造が同時に存在
 
 | 項目 | 内容 |
 |---|---|
-| **売るもの** | OneWay Enterprise AI Platform の年間利用権 |
+| **売るもの** | OneWay Enterprise AIOS の年間利用権 |
 | **価格** | Department 1,000〜2,000万円 / **Enterprise 3,000〜8,000万円** / Enterprise Agreement 年3,000〜8,000万円×3年 |
 | **含むもの** | AI Catalog / Knowledge Hub / Governance / Control Center / 継続アップデート / 運用支援 |
 | **戦略的役割** | ①ARRの源泉 ②EL3の置き場所 ③顧客ロックイン |
@@ -415,6 +415,27 @@ OneWay がこれに学ぶべき点：
 | EL6 Marketplace | **ネットワーク効果** | 極高 | ほぼ不可能 |
 
 **技術は模倣されます。ネットワークと標準は模倣されません。** OneWayの堀は EL3〜EL6 にあります。EL1・EL2 は堀ではなく、堀を作るための入場料です。
+
+---
+
+## 7.5 「7重の堀」— 競合に真似された場合の防御構造
+
+模倣への回答は「どれか1つではなく、7つの重なり」です。**どれか1つならコピーできます。7個全部を、同じ順序で積むのは困難です。**
+
+| # | 堀 | 実体 | 対応レイヤー | 蓄積が始まる時期 |
+|---|---|---|---|---|
+| ① | **Company DNA** | 顧客企業の仕事・判断・例外処理を構造化した知識資産（[04](04-architecture.md) 2.5.1） | EL2 | FY2027（1社目から） |
+| ② | **AI Workforce Architecture** | 人とAIの職務・責任・権限を設計する独自方式（OAFに収録） | EL1 | FY2026 Q4 |
+| ③ | **AI Value Ledger** | AI社員別・業務別の経済効果データ（[04](04-architecture.md) 2.5.2） | EL2 | FY2027 |
+| ④ | **Industry Benchmark** | 業界ごとのAI生産性・導入成功データ（診断＋Ledgerの匿名化集計） | EL2→EL3 | FY2028 |
+| ⑤ | **Vertical AI Packs** | 「不動産管理AIOS」「小売AIOS」等の実業務テンプレート | EL3 | FY2028 |
+| ⑥ | **Enterprise AI Assessment Method** | 経営診断→AI設計→投資判断までの標準手法（9工程） | EL1 | FY2026 Q4 |
+| ⑦ | **Partner / Certification** | OneWay方式で導入できる認定パートナー網 | EL4・EL5 | FY2029〜 |
+
+**運用ルール：**
+- 堀は「宣言」ではなく「蓄積」です。①③④は**顧客数×時間**でしか増えません。だからこそ先行者が守られます
+- ②⑥は文書化した瞬間から堀になります。**FY2026中に文書化を完了させます**
+- 四半期レビューで7つの堀の「深さ」（蓄積量）を数値で点検します（例：DNA構造化社数、Ledger記録月数、Pack本数、認定者数）
 
 ---
 
