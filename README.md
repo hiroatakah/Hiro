@@ -7,6 +7,7 @@
 | ディレクトリ | 内容 |
 |---|---|
 | [`docs/strategy/`](docs/strategy/README.md) | **OneWay 戦略OS** — エンタープライズAI事業（OneWay Enterprise AI Platform）の戦略ナレッジベース |
+| [`docs/meetings/`](docs/meetings/README.md) | **議事録アーカイブ** — 案件・打ち合わせの議事録とサマリー |
 | `.claude/skills/` | Claude Code 用スキル定義 |
 
 ## はじめに読むもの
